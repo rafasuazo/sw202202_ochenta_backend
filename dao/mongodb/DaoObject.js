@@ -32,6 +32,10 @@ module.exports = class DaoObject {
     }
   }
 
+  objectId( id ) {
+    return new ObjectId(id);
+  }
+
   find(query={}, projection=null, orderBy=null, limit=null, skip=null, returnCursor=false){
     const options = {
       projection,
@@ -50,6 +54,13 @@ module.exports = class DaoObject {
     return this.collection.findOne(queryId);
   }
 
+  findOne(query = {}, projection = null ){
+    const options = {
+      projection
+    };
+    return this.collection.findOne(query, options);
+  }
+
   insertOne(docToInsert={}){
     if(docToInsert === {} ) {
       throw Error('A document to be inserted is needed.');
@@ -63,6 +74,8 @@ module.exports = class DaoObject {
   removeOne(_id){
     return this.collection.deleteOne({_id: new ObjectId(_id)});
   }
-  aggregate(){}
+  aggregate(stages){
+    return this.collection.aggregate(stages).toArray();
+  }
 
 }

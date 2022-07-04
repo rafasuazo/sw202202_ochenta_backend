@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Usuario = require('../../../../libs/usuarios');
-const UsuarioDao = require('../../../../dao/models/UsuarioDao');
-const userDao = new CategoryDao();
-const user = new Category(userDao);
+const UsuarioDao = require('../../../../dao/mongodb/models/UsuarioDao');
+const userDao = new UsuarioDao();
+const user = new Usuario(userDao);
 user.init();
 
 router.get('/', async (req, res) => {
@@ -32,12 +32,12 @@ router.get('/all', async (req, res) => {
 router.get('/byid/:codigo', async (req, res) => {
   try {
     const { codigo } = req.params;
-    if (!(/^\d+$/.test(codigo))) {
+    if (!(/^(\d+)|([\da-f]{24}$/).test(codigo)) {
       return res.status(400).json({
         error: 'Se espera un codigo numérico'
       });
     }
-    const registro = await user.getUsuarioById({ codigo: parseInt(codigo) });
+    const registro = await user.getUsuarioById({ codigo });
     return res.status(200).json(registro);
   } catch (ex) {
     console.error(ex);
@@ -52,9 +52,9 @@ router.post('/new', async (req, res) => {
       avatar = '',
       password = '',
       estado = '' } = req.body;
-    if (/^\s*$/.test(ElementInternals)) {
+    if (/^\s*$/.test(email)) {
       return res.status(400).json({
-        error: 'Se espera valor de correo'
+        error: 'Se espera valor de email'
       });
     }
 
@@ -98,10 +98,21 @@ router.put('/update/:codigo', async (req, res) => {
     if (!(/^\d+$/.test(codigo))) {
       return res.status(400).json({ error: 'El codigo debe ser un dígito válido.' });
     }
-    const { categoria, estado } = req.body;
-    if (/^\s*$/.test(categoria)) {
+    const { nombre, password,  avatar, estado } = req.body;
+
+    if (/^\s*$/.test(nombre)) {
       return res.status(400).json({
-        error: 'Se espera valor de categoría'
+        error: 'Se espera valor de nombre'
+      });
+    }
+    if (/^\s*$/.test(avatar)) {
+      return res.status(400).json({
+        error: 'Se espera url de avatar'
+      });
+    }
+    if (/^\s*$/.test(password)) {
+      return res.status(400).json({
+        error: 'Se espera valor de contraseña correcta'
       });
     }
     if (!(/^(ACT)|(INA)$/.test(estado))) {
@@ -110,7 +121,13 @@ router.put('/update/:codigo', async (req, res) => {
       });
     }
 
-    const updateResult = await user.updateCategory({ codigo: parseInt(codigo), categoria, estado });
+    const updateResult = await user.updateUsuario({
+      email,
+      nombre,
+      avatar,
+      password,
+      estado,
+      codigo });
 
     if (!updateResult) {
       return res.status(404).json({ error: 'Categoria no encontrada.' });

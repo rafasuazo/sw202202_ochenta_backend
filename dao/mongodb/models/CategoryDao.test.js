@@ -14,12 +14,12 @@ describe("Testing Categoria Crud in MongoDB", () => {
     jest.resetModules();
     process.env = {
       ...env,
-      MONGODB_URI: "mongodb+srv://ochenta_user:kfrbltXGvt2KZH4Q@cojba.nzup0.mongodb.net/?retryWrites=true&w=majority",
+      MONGODB_URI: "mongodb+srv://rafasuazo:rafarazer97@cluster0.zx4fjjt.mongodb.net/?retryWrites=true&w=majority",
       MONGODB_DB: "sw202202_test",
       MONGODB_SETUP: 1,
     };
     db = await Connection.getDB();
-    CatDao = new CategoriaDao(db,'categories');
+    CatDao = new CategoriaDao(db,'categorias');
     await CatDao.init();
     return true;
   });
